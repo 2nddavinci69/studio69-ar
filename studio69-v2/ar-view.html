@@ -3,7 +3,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080d18">
   <title>Studio69 AR V2</title>
 
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
@@ -14,19 +15,30 @@
 
     body {
       margin: 0;
-      background: #101827;
-      color: white;
+      background: #080d18;
+      color: #fff;
       font-family: Arial, sans-serif;
       text-align: center;
     }
 
-    header { padding: 16px; }
-    h1 { margin: 0 0 8px; color: #38bdf8; }
-    #status { padding: 12px; font-size: 15px; }
+    header { padding: 18px 12px 8px; }
+
+    h1 {
+      margin: 0 0 8px;
+      color: #38bdf8;
+      font-size: 28px;
+    }
+
+    #status {
+      padding: 12px;
+      color: #dbeafe;
+      font-size: 15px;
+      line-height: 1.5;
+    }
 
     button {
-      padding: 13px 22px;
-      margin: 8px;
+      padding: 13px 20px;
+      margin: 6px;
       border: 0;
       border-radius: 9px;
       font-size: 16px;
@@ -34,29 +46,94 @@
       cursor: pointer;
     }
 
-    #startBtn { background: #38bdf8; color: #082f49; }
-    #stopBtn { background: #e5e7eb; color: #111827; }
+    button:disabled { opacity: .6; }
+
+    #startBtn {
+      background: #38bdf8;
+      color: #082f49;
+    }
+
+    #stopBtn {
+      background: #e2e8f0;
+      color: #111827;
+    }
 
     #arScene {
       width: 100%;
       height: 55vh;
       min-height: 300px;
-      background: #202b3b;
+      background: #111827;
     }
 
     #videoBox {
       display: none;
-      padding: 12px;
+      background: #000;
     }
 
-    #videoBox video {
+    #videoBox h2 {
+      color: #38bdf8;
+      margin: 8px 0 12px;
+    }
+
+    #video {
+      display: block;
       width: 100%;
-      max-height: 65vh;
-      background: black;
-      border-radius: 10px;
+      max-height: 76vh;
+      background: #000;
+      object-fit: contain;
     }
 
-    .hint { color: #cbd5e1; padding: 12px; }
+    #videoControls {
+      padding: 10px;
+    }
+
+    #videoHint {
+      color: #cbd5e1;
+      font-size: 14px;
+      padding: 8px 14px 18px;
+    }
+
+    /* Full-screen video mode */
+    body.video-mode {
+      background: #000;
+      overflow: auto;
+    }
+
+    body.video-mode header,
+    body.video-mode #status,
+    body.video-mode #startBtn,
+    body.video-mode #stopBtn,
+    body.video-mode #arScene {
+      display: none !important;
+    }
+
+    body.video-mode #videoBox {
+      display: block !important;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: auto;
+      padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    }
+
+    body.video-mode #videoBox h2 {
+      font-size: 18px;
+      padding: 8px;
+    }
+
+    body.video-mode #video {
+      width: 100%;
+      height: 75vh;
+      max-height: 75vh;
+      object-fit: contain;
+    }
+
+    body.video-mode #videoHint {
+      margin: 0;
+    }
   </style>
 </head>
 
@@ -76,7 +153,7 @@
     mindar-image="imageTargetSrc: ./target.mind; autoStart: false; uiLoading: no; uiScanning: yes; uiError: no;"
     embedded
     color-space="sRGB"
-    renderer="colorManagement: true, physicallyCorrectLights: true"
+    renderer="colorManagement: true"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false">
 
@@ -91,107 +168,182 @@
     </a-entity>
   </a-scene>
 
-  <div id="videoBox">
+  <section id="videoBox">
     <h2>Studio69 Video</h2>
+
     <video
       id="video"
       src="./video.mp4"
       controls
       playsinline
       webkit-playsinline
-      preload="metadata">
+      preload="auto">
     </video>
-    <p class="hint">
-      If playback does not start automatically, press Play.
+
+    <div id="videoControls">
+      <button id="replayScanBtn">Scan Again</button>
+    </div>
+
+    <p id="videoHint">
+      If the video does not start automatically, press Play.
+      Use the video player's full-screen control if needed.
     </p>
-  </div>
+  </section>
 
   <script>
-    const scene = document.querySelector("#arScene");
-    const statusBox = document.querySelector("#status");
-    const startBtn = document.querySelector("#startBtn");
-    const stopBtn = document.querySelector("#stopBtn");
-    const target = document.querySelector("#target");
-    const video = document.querySelector("#video");
-    const videoBox = document.querySelector("#videoBox");
+    const scene = document.getElementById("arScene");
+    const target = document.getElementById("target");
+    const video = document.getElementById("video");
+    const videoBox = document.getElementById("videoBox");
+    const statusBox = document.getElementById("status");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const replayScanBtn = document.getElementById("replayScanBtn");
 
     let cameraStarted = false;
     let targetDetected = false;
+    let switchingToVideo = false;
 
-    video.addEventListener("error", () => {
-      statusBox.textContent =
-        "Video error. Check that studio69-v2/video.mp4 exists.";
-    });
+    function setStatus(message) {
+      statusBox.textContent = message;
+    }
 
-    video.addEventListener("canplay", () => {
-      statusBox.textContent = targetDetected
-        ? "Target found. Video is ready."
-        : "Video ready. Point camera at the target image.";
-    });
+    function getARSystem() {
+      return scene.systems["mindar-image-system"];
+    }
 
-    scene.addEventListener("loaded", () => {
-      statusBox.textContent = "Ready. Press Start Camera.";
-    });
+    async function stopCamera() {
+      const arSystem = getARSystem();
 
-    target.addEventListener("targetFound", async () => {
-      targetDetected = true;
+      if (arSystem && cameraStarted) {
+        try {
+          await arSystem.stop();
+        } catch (error) {
+          console.warn("Camera stop issue:", error);
+        }
+      }
+
+      cameraStarted = false;
+    }
+
+    function showVideoScreen() {
+      document.body.classList.add("video-mode");
       videoBox.style.display = "block";
-      statusBox.textContent = "Target found! Starting video...";
+    }
+
+    async function startVideoAfterDetection() {
+      if (switchingToVideo) return;
+
+      switchingToVideo = true;
+      targetDetected = true;
+      setStatus("Target found. Opening video...");
+
+      // Attempt playback while still inside the target-detection event.
+      let playbackStarted = false;
 
       try {
         await video.play();
-        statusBox.textContent = "Target found. Video playing.";
+        playbackStarted = true;
       } catch (error) {
-        statusBox.textContent =
-          "Target found. Press Play on the video.";
+        console.warn("Autoplay was blocked:", error);
       }
+
+      // Stop AR camera and hide the scanner.
+      await stopCamera();
+      showVideoScreen();
+
+      if (playbackStarted) {
+        setStatus("Video is playing. Camera is off.");
+      } else {
+        setStatus("Target found. Press Play to start the video.");
+      }
+
+      switchingToVideo = false;
+    }
+
+    scene.addEventListener("loaded", () => {
+      setStatus("Ready. Press Start Camera.");
+    });
+
+    video.addEventListener("error", () => {
+      setStatus(
+        "Video could not load. Check that studio69-v2/video.mp4 exists."
+      );
+    });
+
+    video.addEventListener("ended", () => {
+      setStatus("Video finished. Press Scan Again to restart.");
+    });
+
+    target.addEventListener("targetFound", () => {
+      startVideoAfterDetection();
     });
 
     target.addEventListener("targetLost", () => {
-      statusBox.textContent =
-        "Target lost. Video will continue playing.";
-      // Intentionally do not pause the video.
+      // Do not pause the video if the target disappears.
+      if (!switchingToVideo && !document.body.classList.contains("video-mode")) {
+        setStatus("Target lost. Point the camera at the target again.");
+      }
     });
 
     startBtn.addEventListener("click", async () => {
       startBtn.disabled = true;
-      statusBox.textContent = "Starting camera...";
+      setStatus("Starting camera...");
 
       try {
-        await new Promise(resolve => {
-          if (scene.hasLoaded) resolve();
-          else scene.addEventListener("loaded", resolve, { once: true });
-        });
+        if (!scene.hasLoaded) {
+          await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+              reject(new Error("AR scene loading timed out."));
+            }, 15000);
 
-        const arSystem = scene.systems["mindar-image-system"];
+            scene.addEventListener("loaded", () => {
+              clearTimeout(timeout);
+              resolve();
+            }, { once: true });
+          });
+        }
+
+        const arSystem = getARSystem();
 
         if (!arSystem) {
-          throw new Error("MindAR system was not found.");
+          throw new Error("MindAR system not found. Reload the page.");
         }
 
         await arSystem.start();
         cameraStarted = true;
-        statusBox.textContent =
-          "Camera started. Point it at the target image.";
+        setStatus("Camera started. Point it at the target image.");
       } catch (error) {
-        statusBox.textContent =
-          "Camera failed: " + error.message +
-          ". Check HTTPS and camera permission.";
+        console.error(error);
+        setStatus("Camera error: " + error.message);
         startBtn.disabled = false;
       }
     });
 
     stopBtn.addEventListener("click", async () => {
-      try {
-        const arSystem = scene.systems["mindar-image-system"];
-        if (arSystem && cameraStarted) await arSystem.stop();
-      } catch (error) {
-        console.log(error);
-      }
-
-      cameraStarted = false;
+      await stopCamera();
       startBtn.disabled = false;
-      statusBox.textContent = "Camera stopped.";
+      setStatus("Camera stopped.");
+    });
+
+    replayScanBtn.addEventListener("click", async () => {
+      // Stop the video before starting another scan.
+      video.pause();
+      video.currentTime = 0;
+
+      document.body.classList.remove("video-mode");
+      videoBox.style.display = "none";
+
+      targetDetected = false;
+      switchingToVideo = false;
+      startBtn.disabled = false;
+
+      setStatus("Press Start Camera to scan again.");
+    });
+
+    window.addEventListener("pagehide", () => {
+      video.pause();
+      stopCamera();
     });
   </script>
 </body>
