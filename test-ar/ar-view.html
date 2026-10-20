@@ -1,28 +1,247 @@
-#videoScreen.active {
-  display: flex;
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100dvh;
-  z-index: 99999;
-  background: #000;
-  padding: 0;
-}
 
-#videoScreen.active h2,
-#videoScreen.active #hint {
-  display: none;
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Studio69 Full-Screen AR Video</title>
 
-#videoScreen.active #fullVideo {
-  width: 100vw !important;
-  height: 100dvh;
-  max-height: 100dvh;
-  object-fit: contain;
-}
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-#videoScreen.active .controls {
-  position: absolute;
-  bottom: max(12px, env(safe-area-inset-bottom));
-  z-index: 100000;
-}
+  <style>
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: Arial, sans-serif;
+    }
+
+    #message {
+      position: fixed;
+      z-index: 20;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      padding: 14px;
+      border-radius: 10px;
+      color: white;
+      background: #111d;
+      text-align: center;
+    }
+
+    #startButton {
+      margin-top: 10px;
+      padding: 12px 18px;
+      border: 0;
+      border-radius: 8px;
+      background: #f5c451;
+      color: #111;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    a-scene {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Independent video screen, not attached to the AR target */
+    #videoScreen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      z-index: 99999;
+      background: #000;
+    }
+
+    #videoScreen.visible {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #fullVideo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    #videoMessage {
+      position: absolute;
+      top: max(12px, env(safe-area-inset-top));
+      left: 12px;
+      right: 12px;
+      z-index: 100001;
+      color: white;
+      text-align: center;
+      font-size: 13px;
+      text-shadow: 0 1px 4px #000;
+      pointer-events: none;
+    }
+
+    #backButton {
+      position: absolute;
+      z-index: 100002;
+      top: max(45px, calc(env(safe-area-inset-top) + 35px));
+      right: 12px;
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: #f5c451;
+      color: #111;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="message">
+    Studio69 AR<br>
+    Tap the button, then scan your target picture.
+    <br>
+    <button id="startButton">Enable Camera &amp; Video</button>
+  </div>
+
+  <a-scene
+    id="arScene"
+    mindar-image="
+      imageTargetSrc: ./target.mind;
+      autoStart: true;
+      uiLoading: no;
+      uiScanning: yes;
+      uiError: yes;"
+    color-space="sRGB"
+    renderer="colorManagement: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false">
+
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false">
+    </a-camera>
+
+    <!-- Invisible target: video is NOT attached to this entity -->
+    <a-entity
+      id="target"
+      mindar-image-target="targetIndex: 0">
+    </a-entity>
+  </a-scene>
+
+  <!-- Independent full-screen video -->
+  <div id="videoScreen">
+    <div id="videoMessage">
+      Studio69 — video continues independently of the camera
+    </div>
+
+    <button id="backButton" type="button">
+      Back to Camera
+    </button>
+
+    <video
+      id="fullVideo"
+      src="./video.mp4"
+      controls
+      playsinline
+      webkit-playsinline
+      preload="auto"
+      autoplay
+      muted>
+    </video>
+  </div>
+
+  <script>
+    const scene = document.getElementById("arScene");
+    const target = document.getElementById("target");
+    const message = document.getElementById("message");
+    const startButton = document.getElementById("startButton");
+    const videoScreen = document.getElementById("videoScreen");
+    const video = document.getElementById("fullVideo");
+    const backButton = document.getElementById("backButton");
+
+    let scanningEnabled = false;
+    let videoStarted = false;
+
+    startButton.addEventListener("click", async () => {
+      scanningEnabled = true;
+      startButton.textContent = "Camera Enabled";
+      message.innerHTML =
+        "Camera ready. Point it at your target picture.";
+
+      // Prepare video during a real user gesture.
+      video.muted = true;
+      try {
+        await video.play();
+        video.pause();
+        video.currentTime = 0;
+      } catch (error) {
+        // Video can still start muted after the target is found.
+      }
+    });
+
+    target.addEventListener("targetFound", async () => {
+      if (!scanningEnabled || videoStarted) return;
+
+      videoStarted = true;
+
+      // Show independent video screen and hide camera.
+      videoScreen.classList.add("visible");
+      scene.style.display = "none";
+      message.style.display = "none";
+
+      video.currentTime = 0;
+      video.muted = true;
+
+      try {
+        await video.play();
+      } catch (error) {
+        document.getElementById("videoMessage").textContent =
+          "Tap Play on the video controls to begin.";
+      }
+    });
+
+    // Do not pause the video when the picture is removed.
+    target.addEventListener("targetLost", () => {
+      // Intentionally empty.
+    });
+
+    backButton.addEventListener("click", () => {
+      video.pause();
+      videoScreen.classList.remove("visible");
+      scene.style.display = "block";
+      message.style.display = "block";
+      message.innerHTML =
+        "Point the camera at your target picture to scan again.<br>" +
+        '<button id="startButton" type="button">Enable Camera &amp; Video</button>';
+
+      // Allow a new scan.
+      videoStarted = false;
+      scanningEnabled = false;
+
+      // Reconnect the button after replacing its HTML.
+      document.getElementById("startButton").addEventListener("click", () => {
+        scanningEnabled = true;
+        message.textContent =
+          "Camera ready. Point it at your target picture.";
+      });
+    });
+
+    video.addEventListener("error", () => {
+      document.getElementById("videoMessage").textContent =
+        "Video could not load. Check video.mp4 in this folder.";
+    });
+  </script>
+</body>
+</html>
