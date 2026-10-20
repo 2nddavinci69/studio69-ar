@@ -3,18 +3,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Studio69 Full-Screen AR Video</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Studio69 AR Video</title>
 
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     html, body {
       margin: 0;
+      padding: 0;
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -30,14 +32,14 @@
       right: 12px;
       padding: 14px;
       border-radius: 10px;
-      color: white;
-      background: #111d;
+      background: rgba(0, 0, 0, 0.85);
+      color: #fff;
       text-align: center;
     }
 
     #startButton {
-      margin-top: 10px;
-      padding: 12px 18px;
+      margin-top: 12px;
+      padding: 12px 20px;
       border: 0;
       border-radius: 8px;
       background: #f5c451;
@@ -53,25 +55,23 @@
       height: 100%;
     }
 
-    /* Independent video screen, not attached to the AR target */
+    /* Full-screen video, separate from the AR camera */
     #videoScreen {
       display: none;
       position: fixed;
       inset: 0;
+      z-index: 999999;
       width: 100vw;
       height: 100vh;
       height: 100dvh;
-      z-index: 99999;
       background: #000;
     }
 
     #videoScreen.visible {
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: block;
     }
 
-    #fullVideo {
+    #movie {
       display: block;
       width: 100%;
       height: 100%;
@@ -79,29 +79,17 @@
       background: #000;
     }
 
-    #videoMessage {
-      position: absolute;
-      top: max(12px, env(safe-area-inset-top));
-      left: 12px;
-      right: 12px;
-      z-index: 100001;
-      color: white;
-      text-align: center;
-      font-size: 13px;
-      text-shadow: 0 1px 4px #000;
-      pointer-events: none;
-    }
-
     #backButton {
       position: absolute;
-      z-index: 100002;
-      top: max(45px, calc(env(safe-area-inset-top) + 35px));
+      z-index: 1000000;
+      top: max(12px, env(safe-area-inset-top));
       right: 12px;
+      padding: 10px 16px;
       border: 0;
       border-radius: 8px;
-      padding: 10px 14px;
       background: #f5c451;
       color: #111;
+      font-size: 15px;
       font-weight: bold;
     }
   </style>
@@ -109,20 +97,15 @@
 
 <body>
   <div id="message">
-    Studio69 AR<br>
-    Tap the button, then scan your target picture.
-    <br>
-    <button id="startButton">Enable Camera &amp; Video</button>
+    <strong>Studio69 AR</strong>
+    <p>Tap Start Camera, then scan your target picture.</p>
+    <button id="startButton" type="button">Start Camera</button>
   </div>
 
+  <!-- AR scanner only: no video attached to the target -->
   <a-scene
-    id="arScene"
-    mindar-image="
-      imageTargetSrc: ./target.mind;
-      autoStart: true;
-      uiLoading: no;
-      uiScanning: yes;
-      uiError: yes;"
+    id="scanner"
+    mindar-image="imageTargetSrc: ./target.mind; autoStart: true; uiLoading: no; uiScanning: yes; uiError: yes;"
     color-space="sRGB"
     renderer="colorManagement: true"
     vr-mode-ui="enabled: false"
@@ -133,104 +116,84 @@
       look-controls="enabled: false">
     </a-camera>
 
-    <!-- Invisible target: video is NOT attached to this entity -->
     <a-entity
       id="target"
       mindar-image-target="targetIndex: 0">
     </a-entity>
   </a-scene>
 
-  <!-- Independent full-screen video -->
+  <!-- Independent mobile video screen -->
   <div id="videoScreen">
-    <div id="videoMessage">
-      Studio69 — video continues independently of the camera
-    </div>
-
-    <button id="backButton" type="button">
-      Back to Camera
-    </button>
-
     <video
-      id="fullVideo"
+      id="movie"
       src="./video.mp4"
       controls
       playsinline
       webkit-playsinline
       preload="auto"
-      autoplay
       muted>
     </video>
+
+    <button id="backButton" type="button">Back to Camera</button>
   </div>
 
   <script>
-    const scene = document.getElementById("arScene");
+    const scanner = document.getElementById("scanner");
     const target = document.getElementById("target");
     const message = document.getElementById("message");
     const startButton = document.getElementById("startButton");
     const videoScreen = document.getElementById("videoScreen");
-    const video = document.getElementById("fullVideo");
+    const movie = document.getElementById("movie");
     const backButton = document.getElementById("backButton");
 
     let scanningEnabled = false;
-    let videoStarted = false;
+    let videoAlreadyStarted = false;
 
-    startButton.addEventListener("click", async () => {
+    startButton.addEventListener("click", () => {
       scanningEnabled = true;
-      startButton.textContent = "Camera Enabled";
-      message.innerHTML =
+      message.textContent =
         "Camera ready. Point it at your target picture.";
-
-      // Prepare video during a real user gesture.
-      video.muted = true;
-      try {
-        await video.play();
-        video.pause();
-        video.currentTime = 0;
-      } catch (error) {
-        // Video can still start muted after the target is found.
-      }
     });
 
     target.addEventListener("targetFound", async () => {
-      if (!scanningEnabled || videoStarted) return;
+      if (!scanningEnabled || videoAlreadyStarted) return;
 
-      videoStarted = true;
+      videoAlreadyStarted = true;
 
-      // Show independent video screen and hide camera.
-      videoScreen.classList.add("visible");
-      scene.style.display = "none";
+      // Hide the camera completely from the screen.
+      scanner.style.display = "none";
       message.style.display = "none";
 
-      video.currentTime = 0;
-      video.muted = true;
+      // Display the independent video.
+      videoScreen.classList.add("visible");
+
+      movie.currentTime = 0;
+      movie.muted = true;
 
       try {
-        await video.play();
+        await movie.play();
       } catch (error) {
-        document.getElementById("videoMessage").textContent =
-          "Tap Play on the video controls to begin.";
+        // If autoplay is blocked, tap Play on the video controls.
       }
     });
 
-    // Do not pause the video when the picture is removed.
+    // Keep the video playing even when the target disappears.
     target.addEventListener("targetLost", () => {
-      // Intentionally empty.
+      // Intentionally do not pause or stop the video.
     });
 
     backButton.addEventListener("click", () => {
-      video.pause();
+      movie.pause();
       videoScreen.classList.remove("visible");
-      scene.style.display = "block";
+
+      scanner.style.display = "block";
       message.style.display = "block";
       message.innerHTML =
-        "Point the camera at your target picture to scan again.<br>" +
-        '<button id="startButton" type="button">Enable Camera &amp; Video</button>';
+        '<strong>Studio69 AR</strong><p>Tap Start Camera, then scan your target picture.</p><button id="startButton" type="button">Start Camera</button>';
 
-      // Allow a new scan.
-      videoStarted = false;
+      videoAlreadyStarted = false;
       scanningEnabled = false;
 
-      // Reconnect the button after replacing its HTML.
       document.getElementById("startButton").addEventListener("click", () => {
         scanningEnabled = true;
         message.textContent =
@@ -238,9 +201,8 @@
       });
     });
 
-    video.addEventListener("error", () => {
-      document.getElementById("videoMessage").textContent =
-        "Video could not load. Check video.mp4 in this folder.";
+    movie.addEventListener("error", () => {
+      alert("Video could not load. Check that video.mp4 is in the test-ar folder.");
     });
   </script>
 </body>
