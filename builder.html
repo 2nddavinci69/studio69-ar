@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Studio69 - AR Builder (The Art of Living Memories)</title>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --accent-gold: #f59e0b;
+            --accent-glow: rgba(245, 158, 11, 0.3);
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+        html, body {
+            height: 100vh;
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Fixed Header - Logo & Name Left, Slogan Right */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(10px);
+            padding: 12px 25px;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo-svg {
+            width: 42px;
+            height: 42px;
+            filter: drop-shadow(0 0 8px var(--accent-glow));
+        }
+        .header-title-area h1 {
+            color: var(--accent-gold);
+            font-size: 24px;
+            margin: 0;
+            line-height: 1.1;
+        }
+        .header-right .tagline {
+            color: var(--text-muted);
+            font-size: 15px;
+            font-style: italic;
+            font-weight: bold;
+            margin: 0;
+            text-align: right;
+        }
+        /* Main Container Wrapper */
+        .main-wrapper {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 0 15px;
+            box-sizing: border-box;
+            margin-top: 50px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 20px 25px;
+            border-radius: 14px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid rgba(245, 158, 11, 0.2);
+            box-sizing: border-box;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        input:focus {
+            border-color: var(--accent-gold);
+            outline: none;
+            box-shadow: 0 0 6px var(--accent-glow);
+        }
+        button {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #0f172a;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px var(--accent-glow);
+            transition: transform 0.2s;
+            margin-top: 5px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        .success-box {
+            display: none;
+            text-align: center;
+        }
+        .success-box h3 {
+            color: #10b981;
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+        .success-box p {
+            font-size: 12px;
+            margin: 0;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            background: #10b981;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        /* Footer styling */
+        footer {
+            text-align: center;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 8px;
+            margin-top: 15px;
+        }
+        .owner-info {
+            color: var(--accent-gold);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Fixed Header (Logo & Name Left, Slogan Right) -->
+<div class="fixed-header">
+    <div class="header-left">
+        <svg class="logo-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="20" height="20" rx="4" stroke="#f59e0b" stroke-width="2" fill="#1e293b"/>
+            <circle cx="12" cy="12" r="5" stroke="#f59e0b" stroke-width="2"/>
+            <polygon points="10,9 15,12 10,15" fill="#f59e0b"/>
+        </svg>
+        <div class="header-title-area">
+            <h1>Studio69</h1>
+        </div>
+    </div>
+    <div class="header-right">
+        <p class="tagline">The Art of Living Memories</p>
+    </div>
+</div>
+
+<!-- Main Builder Wrapper -->
+<div class="main-wrapper">
+    <div class="container">
+        <form id="builderForm" onsubmit="buildARPage(event)">
+            <div class="form-group">
+                <label for="mindFile">Upload `.mind` tracking file:</label>
+                <input type="file" id="mindFile" accept=".mind" required>
+            </div>
+
+            <div class="form-group">
+                <label for="videoFile">Upload client video (`.mp4`):</label>
+                <input type="file" id="videoFile" accept="video/*" required>
+            </div>
+
+            <button type="submit">Generate AR Player File</button>
+        </form>
+
+        <div id="successBox" class="success-box">
+            <h3>Success! Your AR player is ready 🎉</h3>
+            <p>Click the button below to download the final player file:</p>
+            <a id="finalDownloadBtn" class="download-btn" download="ar-view.html">Download AR Player File 📥</a>
+        </div>
+
+        <!-- Footer inside container -->
+        <footer>
+            Founder / Owner: <span class="owner-info">Mushtaque Ahmed Rajput</span> | Contact: <span class="owner-info">0321-2100966</span><br>
+            &copy; 2026 Studio69. All Rights Reserved.
+        </footer>
+    </div>
+</div>
+
+<script>
+function buildARPage(event) {
+    event.preventDefault();
+
+    const mindFile = document.getElementById('mindFile').files[0];
+    const videoFile = document.getElementById('videoFile').files[0];
+
+    if (!mindFile || !videoFile) {
+        alert("Please select both files.");
+        return;
+    }
+
+    const videoFileName = videoFile.name;
+    const mindFileName = mindFile.name;
+
+    const part1 = '<!DOCTYPE html>\n<html lang="en">\n<head>\n    <meta charset="UTF-8">\n    <meta name="viewport" content="width=device-width, initial-scale=1.0">\n    <title>Studio69 - AR Player</title>\n    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"><\/script>\n    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"><\/script>\n    <style>\n        body { margin: 0; overflow: hidden; }\n    </style>\n</head>\n<body>\n';
+    const part2 = '    <a-scene mindar-image="imageTargetSrc: ' + mindFileName + ';" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">\n';
+    const part3 = '        <a-assets>\n            <video id="ar-video" preload="auto" src="' + videoFileName + '" response-type="arraybuffer" loop crossorigin webkit-playsinline playsinline></video>\n        </a-assets>\n';
+    const part4 = '        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>\n        <a-entity mindar-image-target="targetIndex: 0" id="target-entity">\n';
+    const part5 = '            <a-video src="#ar-video" position="0 0 0" height="0.552" width="1" rotation="0 0 0"></a-video>\n        </a-entity>\n    </a-scene>\n';
+    const part6 = '    <script>\n        document.addEventListener("DOMContentLoaded", () => {\n            const targetEntity = document.querySelector("#target-entity");\n            const video = document.querySelector("#ar-video");\n            targetEntity.addEventListener("targetFound", () => { video.play(); });\n            targetEntity.addEventListener("targetLost", () => { video.pause(); });\n        });\n    <\/script>\n</body>\n</html>';
+
+    const fullCode = part1 + part2 + part3 + part4 + part5 + part6;
+
+    const blob = new Blob([fullCode], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    
+    const downloadBtn = document.getElementById('finalDownloadBtn');
+    downloadBtn.href = url;
+
+    document.getElementById('builderForm').style.display = 'none';
+    document.getElementById('successBox').style.display = 'block';
+}
+</script>
+
+</body>
+</html>
