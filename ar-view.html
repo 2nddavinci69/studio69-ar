@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Studio69 AR Player</title>
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
+  <style>
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;font-family:Arial,sans-serif}
+    #help{position:fixed;z-index:10;top:12px;left:12px;right:12px;padding:12px;border-radius:8px;background:#0f172add;color:white;font-size:14px;text-align:center}
+    #startBtn{margin-top:8px;padding:10px 16px;border:0;border-radius:6px;background:#f59e0b;color:#111827;font-weight:bold}
+  </style>
+</head>
+<body>
+  <div id="help">Point your camera at the target image. If video does not start automatically, tap Start Video.<br><button id="startBtn" type="button">Start Video</button></div>
+  <a-scene mindar-image="imageTargetSrc: ./target.mind; autoStart: true; uiScanning: true;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: true">
+    <a-assets>
+      <video id="ar-video" src="./video.mp4" preload="auto" loop muted playsinline webkit-playsinline crossorigin="anonymous"></video>
+    </a-assets>
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <a-entity id="target-entity" mindar-image-target="targetIndex: 0">
+      <a-video src="#ar-video" position="0 0 0" width="1" height="0.5625" rotation="0 0 0"></a-video>
+    </a-entity>
+  </a-scene>
+  <script>
+    const targetEntity = document.querySelector('#target-entity');
+    const video = document.querySelector('#ar-video');
+    const help = document.querySelector('#help');
+    document.querySelector('#startBtn').addEventListener('click', async () => {
+      try { await video.play(); help.firstChild.textContent = 'Video ready. Point your camera at the target image. '; }
+      catch (e) { help.firstChild.textContent = 'Video could not start. Check the video file and browser permissions. '; }
+    });
+    targetEntity.addEventListener('targetFound', () => { video.play().catch(() => { help.style.display = 'block'; }); });
+    targetEntity.addEventListener('targetLost', () => { video.pause(); });
+    document.querySelector('a-scene').addEventListener('arReady', () => { help.style.display = 'block'; });
+    document.querySelector('a-scene').addEventListener('arError', () => { help.textContent = 'AR failed to start. Check camera permission, HTTPS hosting, and browser compatibility.'; });
+  </script>
+</body>
+</html>
