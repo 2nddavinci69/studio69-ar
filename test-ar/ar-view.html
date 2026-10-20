@@ -150,7 +150,7 @@
       startButton.textContent = "Starting camera...";
 
       try {
-        await scene.systems["mindar-image"].start();
+        await scene.systems["mindar-image-system"].start();
         arStarted = true;
         startButton.textContent = "Camera Started";
         message.innerHTML =
