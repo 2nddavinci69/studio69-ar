@@ -1,12 +1,12 @@
-
 {
-  "name": "Studio69 AR",
+  "name": "Studio69 AR - Scan &amp; Watch",
   "short_name": "Studio69 AR",
-  "description": "Scan a picture and watch its video.",
+  "description": "Studio69 AR lets you scan a target picture and watch its linked video using augmented reality.",
   "start_url": "./ar-view.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#101827",
-  "theme_color": "#0284c7"
+  "theme_color": "#0284c7",
+  "id": "Studio69 AR lets you scan a target picture and watch its linked video using augmented reality."
 }
