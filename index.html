@@ -1,314 +1,119 @@
+
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Studio69 - The Art of Living Memories</title>
-    <!-- QR Code Generator Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <style>
-        :root {
-            --bg-dark: #0f172a;
-            --card-bg: #1e293b;
-            --accent-gold: #f59e0b;
-            --accent-glow: rgba(245, 158, 11, 0.3);
-            --text-light: #f8fafc;
-            --text-muted: #94a3b8;
-        }
-        html, body {
-            height: 100vh;
-            overflow: hidden;
-            margin: 0;
-            padding: 0;
-            font-family: Arial, sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        /* Fixed Header - Logo & Name Left, Slogan Right */
-        .fixed-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(15, 23, 42, 0.98);
-            backdrop-filter: blur(10px);
-            padding: 10px 25px;
-            z-index: 1000;
-            border-bottom: 1px solid rgba(245, 158, 11, 0.2);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-        }
-        .header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .logo-svg {
-            width: 38px;
-            height: 38px;
-            filter: drop-shadow(0 0 8px var(--accent-glow));
-        }
-        .header-title-area h1 {
-            color: var(--accent-gold);
-            font-size: 22px;
-            margin: 0;
-            line-height: 1.1;
-        }
-        .header-right .tagline {
-            color: var(--text-muted);
-            font-size: 14px;
-            font-style: italic;
-            font-weight: bold;
-            margin: 0;
-            text-align: right;
-        }
-        /* Main Container Wrapper */
-        .main-wrapper {
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            padding: 0 15px;
-            box-sizing: border-box;
-            margin-top: 45px;
-        }
-        .container {
-            width: 100%;
-            max-width: 580px;
-            background: var(--card-bg);
-            padding: 15px 22px;
-            border-radius: 14px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid rgba(245, 158, 11, 0.2);
-            box-sizing: border-box;
-        }
-        /* Video Showcase Styling */
-        .video-showcase {
-            width: 100%;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            overflow: hidden;
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            background: #000;
-            text-align: center;
-            max-height: 110px;
-        }
-        .video-showcase video {
-            width: 100%;
-            height: 110px;
-            object-fit: cover;
-            display: block;
-        }
-        .form-group {
-            margin-bottom: 8px;
-        }
-        label {
-            display: block;
-            margin-bottom: 2px;
-            font-weight: bold;
-            font-size: 11px;
-            color: var(--text-light);
-        }
-        input, textarea {
-            width: 100%;
-            padding: 7px 10px;
-            background: #0f172a;
-            border: 1px solid #475569;
-            border-radius: 6px;
-            color: white;
-            font-size: 12px;
-            box-sizing: border-box;
-        }
-        textarea {
-            resize: none;
-            height: 35px;
-        }
-        input:focus, textarea:focus {
-            border-color: var(--accent-gold);
-            outline: none;
-            box-shadow: 0 0 6px var(--accent-glow);
-        }
-        .file-hint {
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 1px;
-        }
-        button {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: #0f172a;
-            padding: 9px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 4px 12px var(--accent-glow);
-            transition: transform 0.2s;
-            margin-top: 3px;
-        }
-        button:hover {
-            transform: translateY(-2px);
-        }
-        .success-box {
-            display: none;
-            text-align: center;
-        }
-        .success-box h3 {
-            color: #10b981;
-            margin: 0 0 3px 0;
-            font-size: 15px;
-        }
-        .success-box p {
-            font-size: 11px;
-            margin: 0;
-        }
-        .download-btn {
-            display: inline-block;
-            margin-top: 6px;
-            background: #10b981;
-            color: white;
-            padding: 8px 16px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 12px;
-        }
-        /* Footer styling */
-        footer {
-            text-align: center;
-            font-size: 10px;
-            color: var(--text-muted);
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 5px;
-            margin-top: 8px;
-        }
-        .owner-info {
-            color: var(--accent-gold);
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Fixed Header -->
-<div class="fixed-header">
-    <div class="header-left">
-        <svg class="logo-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="2" y="2" width="20" height="20" rx="4" stroke="#f59e0b" stroke-width="2" fill="#1e293b"/>
-            <circle cx="12" cy="12" r="5" stroke="#f59e0b" stroke-width="2"/>
-            <polygon points="10,9 15,12 10,15" fill="#f59e0b"/>
-        </svg>
-        <div class="header-title-area">
-            <h1>Studio69</h1>
-        </div>
-    </div>
-    <div class="header-right">
-        <p class="tagline">The Art of Living Memories</p>
-    </div>
-</div>
+  <title>Studio69 AR</title>
 
-<!-- Main Form Wrapper -->
-<div class="main-wrapper">
-    <div class="container">
-        
-        <!-- Video Showcase Preview -->
-        <div class="video-showcase">
-            <video autoplay loop muted playsinline>
-                <source src="promo-video.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-        </div>
+  <meta
+    name="description"
+    content="Scan a picture with Studio69 AR and watch its video."
+  >
 
-        <!-- Order Form -->
-        <form id="orderForm" onsubmit="processOrder(event)">
-            <div class="form-group">
-                <label for="clientName">Your Name:</label>
-                <input type="text" id="clientName" placeholder="e.g. John Doe" required>
-            </div>
+  <meta name="theme-color" content="#0284c7">
 
-            <div class="form-group">
-                <label for="clientPhone">WhatsApp Number:</label>
-                <input type="tel" id="clientPhone" placeholder="e.g. 03212100966" required>
-            </div>
+  <link rel="manifest" href="./manifest.json">
 
-            <div class="form-group">
-                <label for="photoInput">Select Your Photo (For Frame):</label>
-                <input type="file" id="photoInput" accept="image/*" required>
-                <div class="file-hint">Choose picture for physical frame.</div>
-            </div>
-
-            <div class="form-group">
-                <label for="address">Delivery Address:</label>
-                <textarea id="address" placeholder="Enter complete address..." required></textarea>
-            </div>
-
-            <button type="submit">Send Order & Download Print File</button>
-        </form>
-
-        <!-- Success & Download Section -->
-        <div id="successBox" class="success-box">
-            <h3>Order Sent Successfully! 🎉</h3>
-            <p>Your frame print photo & QR code are ready:</p>
-            
-            <div class="preview-section" style="text-align: center;">
-                <div id="qrcode" style="display:inline-block; background:white; padding:4px; border-radius:4px; margin-top:5px;"></div>
-                <br>
-                <a id="downloadLink" class="download-btn" download="studio69-print-photo.jpg">Download Print Photo 📥</a>
-            </div>
-        </div>
-
-        <!-- Footer inside container -->
-        <footer>
-            Founder / Owner: <span class="owner-info">Mushtaque Ahmed Rajput</span> | Contact: <span class="owner-info">0321-2100966</span><br>
-            &copy; 2026 Studio69. All Rights Reserved.
-        </footer>
-    </div>
-</div>
-
-<script>
-function processOrder(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('clientName').value;
-    const phone = document.getElementById('clientPhone').value;
-    const address = document.getElementById('address'].value;
-    const photoInput = document.getElementById('photoInput');
-
-    if (photoInput.files && photoInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const imgDataUrl = e.target.result;
-            
-            const downloadBtn = document.getElementById('downloadLink');
-            downloadBtn.href = imgDataUrl;
-            
-            document.getElementById('qrcode').innerHTML = "";
-            new QRCode(document.getElementById("qrcode"), {
-                text: "https://wa.me/923212100966?text=Hello%20Studio69,%20this%20is%20my%20order%20photo",
-                width: 75,
-                height: 75
-            });
-
-            const myWhatsAppNumber = "923212100966";
-            const message = `Hello Studio69! New order details:\n\nName: ${name}\nPhone: ${phone}\nAddress: ${address}\n\n(I have uploaded my photo on the website and sending my video in this chat)`;
-            const whatsappURL = `https://wa.me/${myWhatsAppNumber}?text=` + encodeURIComponent(message);
-            
-            window.open(whatsappURL, '_blank');
-
-            document.getElementById('orderForm').style.display = 'none';
-            document.getElementById('successBox').style.display = 'block';
-        }
-        reader.readAsDataURL(photoInput.files[0]);
+  <style>
+    * {
+      box-sizing: border-box;
     }
-}
-</script>
 
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      font-family: Arial, sans-serif;
+      color: white;
+      background: linear-gradient(135deg, #101827, #075985);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 440px;
+      padding: 32px 24px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 22px;
+      background: rgba(255,255,255,0.08);
+      box-shadow: 0 15px 45px rgba(0,0,0,0.25);
+    }
+
+    .logo {
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      background: #0284c7;
+      font-size: 25px;
+      font-weight: bold;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 32px;
+    }
+
+    p {
+      line-height: 1.7;
+      color: #e0f2fe;
+    }
+
+    .start-button {
+      display: block;
+      margin-top: 26px;
+      padding: 16px 20px;
+      border-radius: 12px;
+      background: #0284c7;
+      color: white;
+      text-decoration: none;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .start-button:hover {
+      background: #0369a1;
+    }
+
+    .note {
+      margin-top: 22px;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <div class="logo">69</div>
+
+    <h1>Studio69 AR</h1>
+
+    <p>
+      Scan the picture.<br>
+      Watch the video.
+    </p>
+
+    <p>
+      Point your mobile camera at a supported Studio69 target picture
+      and watch its video play automatically.
+    </p>
+
+    <a class="start-button" href="./ar-view.html">
+      Start Scanning
+    </a>
+
+    <p class="note">
+      Camera permission is required to scan pictures.
+    </p>
+  </main>
 </body>
 </html>
