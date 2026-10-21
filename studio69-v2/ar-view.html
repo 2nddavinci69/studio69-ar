@@ -3,8 +3,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Studio69 AR</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studio69 AR Video</title>
 
   <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
@@ -14,101 +14,114 @@
 
     body {
       margin: 0;
+      font-family: Arial, sans-serif;
       background: #101827;
       color: white;
-      font-family: Arial, sans-serif;
     }
 
-    #help {
+    #scanScreen {
       position: fixed;
-      z-index: 10;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 16px;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
       text-align: center;
       background: #101827;
+      z-index: 1;
     }
 
-    h1 { color: #38bdf8; margin: 0 0 8px; }
+    #scanScreen h1 {
+      margin-bottom: 10px;
+      color: #38bdf8;
+    }
 
-    #status { padding: 10px; line-height: 1.5; }
+    #status {
+      margin: 18px 0;
+      line-height: 1.6;
+    }
 
     button {
-      padding: 12px 18px;
-      margin: 5px;
       border: 0;
-      border-radius: 8px;
-      font-weight: bold;
+      border-radius: 10px;
+      padding: 14px 22px;
+      margin: 8px;
       font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #0284c7;
+      color: white;
     }
-
-    #startBtn { background: #38bdf8; color: #082f49; }
-    #scanAgainBtn { background: #e2e8f0; color: #111827; }
 
     #arScene {
       position: fixed;
       inset: 0;
       width: 100%;
       height: 100%;
+      z-index: 2;
+      display: none;
     }
 
     #videoScreen {
-      display: none;
       position: fixed;
-      z-index: 1000;
       inset: 0;
       width: 100%;
       height: 100%;
-      height: 100dvh;
-      background: black;
+      display: none;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      gap: 14px;
+      padding: 12px;
+      background: #000;
+      z-index: 10;
     }
 
     #finalVideo {
+      display: block;
       width: 100%;
-      height: 85%;
+      max-width: 1100px;
+      max-height: 78vh;
       object-fit: contain;
-      background: black;
+      background: #000;
     }
 
-    #videoActions {
-      width: 100%;
-      padding: 8px;
+    #videoMessage {
       text-align: center;
-      background: #101827;
       color: white;
+      font-size: 14px;
     }
-
-    body.video-mode #help { display: none; }
   </style>
 </head>
 
 <body>
-  <div id="help">
+
+  <section id="scanScreen">
     <h1>Studio69 AR</h1>
-    <div>Scan the target image. Watch the video.</div>
-    <div id="status">Press Start Camera.</div>
-    <button id="startBtn">Start Camera</button>
-  </div>
+    <p>Scan your target picture to open the video.</p>
+    <div id="status">Press Start Scanning to begin.</div>
+    <button id="startButton">Start Scanning</button>
+  </section>
 
   <a-scene
     id="arScene"
-    mindar-image="imageTargetSrc: ./target.mind; autoStart: false; uiScanning: yes; uiLoading: no;"
-    embedded
+    mindar-image="imageTargetSrc: ./target.mind; autoStart: false; uiLoading: no; uiError: no; uiScanning: no;"
     color-space="sRGB"
-    renderer="colorManagement: true"
+    renderer="colorManagement: true, physicallyCorrectLights: true"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false">
 
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <a-camera
+      position="0 0 0"
+      look-controls="enabled: false">
+    </a-camera>
 
     <a-entity
-      id="target"
+      id="imageTarget"
       mindar-image-target="targetIndex: 0">
     </a-entity>
+
   </a-scene>
 
   <section id="videoScreen">
@@ -121,143 +134,103 @@
       preload="auto">
     </video>
 
-    <div id="videoActions">
-      <div id="videoStatus">Video ready.</div>
-      <button id="scanAgainBtn">Scan Again</button>
+    <div id="videoMessage">
+      Your video is independent of the scanned picture.
     </div>
+
+    <button id="scanAgainButton">Scan Again</button>
   </section>
 
   <script>
-    const scene = document.getElementById("arScene");
-    const target = document.getElementById("target");
+    const scanScreen = document.getElementById("scanScreen");
+    const arScene = document.getElementById("arScene");
     const status = document.getElementById("status");
+    const startButton = document.getElementById("startButton");
     const videoScreen = document.getElementById("videoScreen");
     const finalVideo = document.getElementById("finalVideo");
-    const videoStatus = document.getElementById("videoStatus");
-    const startBtn = document.getElementById("startBtn");
-    const scanAgainBtn = document.getElementById("scanAgainBtn");
+    const videoMessage = document.getElementById("videoMessage");
+    const scanAgainButton = document.getElementById("scanAgainButton");
+    const imageTarget = document.getElementById("imageTarget");
 
-    let cameraStarted = false;
-    let openingVideo = false;
+    let scanningStarted = false;
+    let targetDetected = false;
 
-    function getARSystem() {
-      return scene.systems["mindar-image-system"];
-    }
+    startButton.addEventListener("click", async () => {
+      if (scanningStarted) return;
 
-    async function stopCamera() {
-      const system = getARSystem();
+      scanningStarted = true;
+      startButton.disabled = true;
+      status.textContent = "Starting camera. Please allow camera access.";
 
-      if (system && cameraStarted) {
-        try {
-          await system.stop();
-        } catch (error) {
-          console.warn("Camera stop:", error);
-        }
+      arScene.style.display = "block";
+
+      try {
+        await arScene.systems["mindar-image-system"].start();
+        status.textContent = "Camera is ready. Point it at your target picture.";
+      } catch (error) {
+        console.error("Camera start error:", error);
+        arScene.style.display = "none";
+        scanningStarted = false;
+        startButton.disabled = false;
+        status.textContent =
+          "Camera could not start. Check camera permission and try again.";
+      }
+    });
+
+    imageTarget.addEventListener("targetFound", async () => {
+      if (targetDetected) return;
+      targetDetected = true;
+
+      status.textContent = "Picture detected. Opening video...";
+
+      // Show the video in its own fixed screen.
+      // It is NOT attached to the AR target.
+      videoScreen.style.display = "flex";
+      scanScreen.style.display = "none";
+
+      // Stop AR tracking and camera after detection.
+      try {
+        await arScene.systems["mindar-image-system"].stop();
+      } catch (error) {
+        console.warn("Camera stop notice:", error);
       }
 
-      cameraStarted = false;
-    }
+      arScene.style.display = "none";
 
-    async function openVideo() {
-      if (openingVideo) return;
-      openingVideo = true;
-
-      status.textContent = "Image recognized. Opening video.";
-
-      // Stop camera before showing the independent video player.
-      await stopCamera();
-
-      scene.style.display = "none";
-      document.body.classList.add("video-mode");
-      videoScreen.style.display = "flex";
-
+      // The video stays visible even after the picture is removed.
       try {
         await finalVideo.play();
-        videoStatus.textContent = "Video playing. Camera is stopped.";
+        videoMessage.textContent = "Video playing.";
       } catch (error) {
-        videoStatus.textContent = "Tap Play to start the video.";
-      }
-
-      openingVideo = false;
-    }
-
-    scene.addEventListener("loaded", () => {
-      status.textContent = "Ready. Press Start Camera.";
-    });
-
-    scene.addEventListener("arError", event => {
-      status.textContent =
-        "AR error. Check camera permission and target.mind.";
-      console.error(event);
-      startBtn.disabled = false;
-    });
-
-    target.addEventListener("targetFound", openVideo);
-
-    target.addEventListener("targetLost", () => {
-      // Intentionally do not pause the independent video.
-      if (!openingVideo) {
-        status.textContent = "Target lost.";
+        console.warn("Video playback needs user interaction:", error);
+        videoMessage.textContent =
+          "If the video does not start, press Play on the video controls.";
       }
     });
 
-    startBtn.addEventListener("click", async () => {
-      startBtn.disabled = true;
-      status.textContent = "Starting camera...";
-
-      try {
-        if (!scene.hasLoaded) {
-          await new Promise((resolve, reject) => {
-            const timer = setTimeout(
-              () => reject(new Error("AR loading timed out")),
-              15000
-            );
-
-            scene.addEventListener("loaded", () => {
-              clearTimeout(timer);
-              resolve();
-            }, { once: true });
-          });
-        }
-
-        const system = getARSystem();
-
-        if (!system) {
-          throw new Error("MindAR system not found.");
-        }
-
-        await system.start();
-        cameraStarted = true;
-        status.textContent = "Camera started. Scan the original target image.";
-      } catch (error) {
-        console.error(error);
-        status.textContent = "Camera error: " + error.message;
-        startBtn.disabled = false;
-      }
-    });
-
-    scanAgainBtn.addEventListener("click", async () => {
+    scanAgainButton.addEventListener("click", async () => {
       finalVideo.pause();
       finalVideo.currentTime = 0;
 
       videoScreen.style.display = "none";
-      scene.style.display = "block";
-      document.body.classList.remove("video-mode");
+      scanScreen.style.display = "flex";
+      arScene.style.display = "none";
 
-      openingVideo = false;
-      startBtn.disabled = false;
-      status.textContent = "Press Start Camera to scan again.";
+      targetDetected = false;
+      scanningStarted = false;
+      startButton.disabled = false;
+      status.textContent = "Press Start Scanning to begin.";
+    });
+
+    finalVideo.addEventListener("ended", () => {
+      videoMessage.textContent = "Video finished. Press Scan Again to scan another picture.";
     });
 
     finalVideo.addEventListener("error", () => {
-      videoStatus.textContent =
-        "Video failed to load. Check the root video.mp4 file.";
-    });
-
-    window.addEventListener("pagehide", () => {
-      finalVideo.pause();
-      stopCamera();
+      videoMessage.textContent =
+        "Video could not load. Check that video.mp4 exists in the same folder.";
     });
   </script>
+
 </body>
 </html>
