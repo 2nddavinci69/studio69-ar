@@ -1,0 +1,12 @@
+
+{
+  "name": "Studio69 AR",
+  "short_name": "Studio69 AR",
+  "description": "Scan a picture and watch its video.",
+  "start_url": "./ar-view.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#101827",
+  "theme_color": "#0284c7"
+}
