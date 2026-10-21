@@ -290,10 +290,14 @@
         "Video failed to load. Check that video.mp4 exists in the main folder.";
     });
 
-    finalVideo.addEventListener("ended", () => {
-      videoMessage.textContent =
-        "Video finished. Press Scan Again to scan another picture.";
-    });
+   
+finalVideo.addEventListener("ended", () => {
+  videoMessage.textContent =
+    "Video finished. Ready to scan another picture.";
+
+  scanAgainButton.textContent = "Scan Another Picture";
+  scanAgainButton.style.display = "inline-block";
+});
 
     scanAgainButton.addEventListener("click", () => {
       finalVideo.pause();
