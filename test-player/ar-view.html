@@ -1,247 +1,288 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<title>Studio69 AR Player</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#000000">
+  <title>Studio69 AR Player</title>
 
-<script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
-<style>
-html,body {
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#000;
-  font-family:Arial,sans-serif;
-}
-#message {
-  position:fixed;
-  z-index:20;
-  top:12px;
-  left:12px;
-  right:12px;
-  padding:14px;
-  background:#111e;
-  color:#fff;
-  border:1px solid #ff7900;
-  border-radius:10px;
-  text-align:center;
-  line-height:1.5;
-}
-#startButton {
-  margin-top:10px;
-  padding:12px 20px;
-  border:0;
-  border-radius:7px;
-  background:#ff7900;
-  color:#111;
-  font-weight:bold;
-  font-size:16px;
-}
-a-scene {
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-}
-body.video-mode #message,
-body.video-mode a-scene {
-  display:none !important;
-}
-#videoScreen {
-  display:none;
-  position:fixed;
-  inset:0;
-  z-index:100;
-  width:100%;
-  height:100%;
-  background:#000;
-}
-#videoScreen video {
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  background:#000;
-}
-#videoError {
-  display:none;
-  position:fixed;
-  z-index:110;
-  left:12px;
-  right:12px;
-  bottom:20px;
-  padding:12px;
-  background:#111e;
-  color:#fff;
-  border:1px solid #ff7900;
-  border-radius:8px;
-  text-align:center;
-}
-</style>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+      font-family: Arial, sans-serif;
+    }
+
+    /* Live camera feed */
+    video.mindar-video {
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      object-fit: cover !important;
+      z-index: 0 !important;
+      display: block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+
+    /* Transparent AR layer */
+    a-scene {
+      position: fixed !important;
+      inset: 0 !important;
+      width: 100% !important;
+      height: 100% !important;
+      z-index: 1 !important;
+      background: transparent !important;
+    }
+
+    a-scene canvas {
+      background: transparent !important;
+    }
+
+    /* Instructions */
+    #message {
+      position: fixed;
+      z-index: 20;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      padding: 14px;
+      background: rgba(17, 17, 17, 0.88);
+      color: #fff;
+      border: 1px solid #ff7900;
+      border-radius: 10px;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    #startButton {
+      margin-top: 10px;
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 7px;
+      background: #ff7900;
+      color: #111;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #startButton:disabled {
+      opacity: 0.7;
+    }
+
+    /* Full-screen video overlay */
+    #videoScreen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      z-index: 1000;
+      background: #000;
+    }
+
+    #fullScreenVideo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    #videoError {
+      display: none;
+      position: fixed;
+      z-index: 1010;
+      left: 12px;
+      right: 12px;
+      bottom: 20px;
+      padding: 12px;
+      background: rgba(17, 17, 17, 0.94);
+      color: #fff;
+      border: 1px solid #ff7900;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    /* Hide scanner after target is detected */
+    body.video-mode #message,
+    body.video-mode a-scene,
+    body.video-mode video.mindar-video {
+      display: none !important;
+    }
+  </style>
 </head>
 
 <body>
-<div id="message">
-  <strong>Studio69 AR</strong><br>
-  Point your camera at the target picture.<br>
-  <button id="startButton" type="button">Start Scanning</button>
-</div>
-
-<div id="videoScreen">
-  <video
-    id="fullScreenVideo"
-    src="video.mp4"
-    playsinline
-    webkit-playsinline
-    controls
-    loop
-    preload="auto"
-  ></video>
-  <div id="videoError">
-    Video could not start automatically. Tap the video Play button.
+  <div id="message">
+    <strong>Studio69 AR</strong><br>
+    Point your camera at the target picture.<br>
+    <button id="startButton" type="button">Start Scanning</button>
   </div>
-</div>
 
-<a-scene
-  id="arScene"
-  mindar-image="imageTargetSrc: ./target.mind; autoStart: false; uiLoading: no; uiScanning: yes; uiError: no;"
-  color-space="sRGB"
-  renderer="colorManagement: true; alpha: true"
-  vr-mode-ui="enabled: false"
-  device-orientation-permission-ui="enabled: false"
->
-  <a-assets>
+  <div id="videoScreen">
     <video
-      id="arVideo"
+      id="fullScreenVideo"
       src="./video.mp4"
-      preload="auto"
-      muted
       playsinline
       webkit-playsinline
-      crossorigin="anonymous"
+      controls
+      loop
+      preload="auto"
     ></video>
-  </a-assets>
 
-  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <div id="videoError">
+      Tap Play on the video to start playback.
+    </div>
+  </div>
 
-  <a-entity id="targetEntity" mindar-image-target="targetIndex: 0">
-    <a-video
-      src="#arVideo"
+  <a-scene
+    id="arScene"
+    mindar-image="imageTargetSrc: ./target.mind; autoStart: false; uiLoading: no; uiScanning: no; uiError: yes;"
+    color-space="sRGB"
+    renderer="colorManagement: true; alpha: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false"
+    embedded
+  >
+    <a-camera
       position="0 0 0"
-      height="0.552"
-      width="1"
-      rotation="0 0 0"
-    ></a-video>
-  </a-entity>
-</a-scene>
+      look-controls="enabled: false"
+    ></a-camera>
 
-<script>
-const scene = document.querySelector('#arScene');
-const targetEntity = document.querySelector('#targetEntity');
-const message = document.querySelector('#message');
-const startButton = document.querySelector('#startButton');
-const arVideo = document.querySelector('#arVideo');
-const fullScreenVideo = document.querySelector('#fullScreenVideo');
-const videoScreen = document.querySelector('#videoScreen');
-const videoError = document.querySelector('#videoError');
+    <a-entity
+      id="targetEntity"
+      mindar-image-target="targetIndex: 0"
+    ></a-entity>
+  </a-scene>
 
-let scanningStarted = false;
-let targetAlreadyFound = false;
+  <script>
+    const scene = document.querySelector('#arScene');
+    const targetEntity = document.querySelector('#targetEntity');
+    const message = document.querySelector('#message');
+    const startButton = document.querySelector('#startButton');
+    const videoScreen = document.querySelector('#videoScreen');
+    const fullScreenVideo = document.querySelector('#fullScreenVideo');
+    const videoError = document.querySelector('#videoError');
 
-startButton.addEventListener('click', async () => {
-  if (scanningStarted) return;
+    let scanningStarted = false;
+    let targetAlreadyFound = false;
 
-  scanningStarted = true;
-  startButton.disabled = true;
-  startButton.textContent = 'Starting Camera...';
+    startButton.addEventListener('click', async () => {
+      if (scanningStarted || targetAlreadyFound) return;
 
-  try {
-    const arSystem = scene.systems['mindar-image-system'];
+      scanningStarted = true;
+      startButton.disabled = true;
+      startButton.textContent = 'Starting Camera...';
 
-    if (!arSystem) {
-      throw new Error('AR system is not ready');
-    }
+      try {
+        const arSystem = scene.systems['mindar-image-system'];
 
-    await arSystem.start();
+        if (!arSystem) {
+          throw new Error('AR system is not ready. Reload the page and try again.');
+        }
 
-    message.innerHTML =
-      '<strong>Studio69 AR</strong><br>Camera started. Point it at the target picture.';
-  } catch (error) {
-    console.error(error);
-    scanningStarted = false;
-    startButton.disabled = false;
-    startButton.textContent = 'Try Starting Camera Again';
-    message.innerHTML =
-      'Camera could not start. Allow camera permission and open this page over HTTPS.<br>';
-    message.appendChild(startButton);
-  }
-});
+        await arSystem.start();
 
-targetEntity.addEventListener('targetFound', async () => {
-  if (targetAlreadyFound) return;
-  targetAlreadyFound = true;
+        message.innerHTML =
+          '<strong>Studio69 AR</strong><br>' +
+          'Camera started. Point it at the target picture.';
+      } catch (error) {
+        console.error('Camera start error:', error);
+        scanningStarted = false;
+        startButton.disabled = false;
+        startButton.textContent = 'Try Starting Camera Again';
 
-  message.textContent = 'Target found! Opening your video...';
+        message.innerHTML =
+          '<strong>Camera could not start.</strong><br>' +
+          'Check camera permission and internet connection.<br>';
 
-  try {
-    const arSystem = scene.systems['mindar-image-system'];
-    if (arSystem) {
-      await arSystem.stop();
-    }
-  } catch (error) {
-    console.warn('Camera stop warning:', error);
-  }
+        message.appendChild(startButton);
+      }
+    });
 
-  document.body.classList.add('video-mode');
-  videoScreen.style.display = 'block';
+    targetEntity.addEventListener('targetFound', async () => {
+      if (targetAlreadyFound) return;
+      targetAlreadyFound = true;
 
-  arVideo.pause();
+      message.textContent = 'Target found! Opening your video...';
 
-  fullScreenVideo.currentTime = 0;
-  fullScreenVideo.muted = false;
+      /* Stop scanning after recognizing the target */
+      try {
+        const arSystem = scene.systems['mindar-image-system'];
 
-  try {
-    await fullScreenVideo.play();
-  } catch (error) {
-    console.warn('Autoplay was blocked:', error);
-    fullScreenVideo.muted = true;
+        if (arSystem) {
+          await arSystem.stop();
+        }
+      } catch (error) {
+        console.warn('Camera stop warning:', error);
+      }
 
-    try {
-      await fullScreenVideo.play();
-      videoError.style.display = 'block';
+      /* Show independent video screen */
+      document.body.classList.add('video-mode');
+      videoScreen.style.display = 'block';
+
+      fullScreenVideo.currentTime = 0;
+      fullScreenVideo.muted = false;
+
+      try {
+        await fullScreenVideo.play();
+        videoError.style.display = 'none';
+      } catch (error) {
+        console.warn('Video autoplay blocked:', error);
+
+        /* Try muted playback if the browser blocks sound */
+        fullScreenVideo.muted = true;
+
+        try {
+          await fullScreenVideo.play();
+          videoError.textContent =
+            'Video is playing without sound. Use the video controls for sound.';
+          videoError.style.display = 'block';
+        } catch (secondError) {
+          console.error('Video playback error:', secondError);
+          videoError.textContent =
+            'Video could not start. Tap Play on the video controls.';
+          videoError.style.display = 'block';
+          fullScreenVideo.controls = true;
+        }
+      }
+    });
+
+    /* Intentionally do not pause video when target is lost */
+    targetEntity.addEventListener('targetLost', () => {
+      // Keep the full-screen video playing.
+    });
+
+    fullScreenVideo.addEventListener('playing', () => {
+      videoError.style.display = 'none';
+    });
+
+    fullScreenVideo.addEventListener('error', () => {
       videoError.textContent =
-        'Video started muted. Tap the video controls to enable sound.';
-    } catch (secondError) {
+        'Could not load video.mp4. Check that the file exists in this folder.';
       videoError.style.display = 'block';
-      videoError.textContent =
-        'Tap Play on the video to start playback.';
-      fullScreenVideo.controls = true;
-    }
-  }
-});
+    });
 
-targetEntity.addEventListener('targetLost', () => {
-  // Intentionally do not pause the full-screen video.
-  // Once the target is found, the video continues independently.
-});
-
-fullScreenVideo.addEventListener('playing', () => {
-  videoError.style.display = 'none';
-});
-
-fullScreenVideo.addEventListener('error', () => {
-  videoError.style.display = 'block';
-  videoError.textContent =
-    'Video file could not load. Confirm video.mp4 is in the same folder as ar-view.html.';
-});
-
-window.addEventListener('error', (event) => {
-  console.error('Player error:', event.message);
-});
-</script>
+    window.addEventListener('error', (event) => {
+      console.error('Studio69 AR error:', event.message);
+    });
+  </script>
 </body>
 </html>
