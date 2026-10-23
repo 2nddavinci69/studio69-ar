@@ -10,7 +10,9 @@
 <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 
 <style>
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 html, body {
   margin: 0;
@@ -36,9 +38,9 @@ a-scene {
   top: 12px;
   left: 12px;
   right: 12px;
-  padding: 14px;
+  padding: 12px;
   background: #171717;
-  color: #fff;
+  color: white;
   border: 1px solid #ff7900;
   border-radius: 10px;
   text-align: center;
@@ -47,10 +49,10 @@ a-scene {
 #startButton {
   margin-top: 10px;
   padding: 12px 22px;
+  border: none;
+  border-radius: 7px;
   background: #ff7900;
   color: #111;
-  border: 0;
-  border-radius: 7px;
   font-size: 16px;
   font-weight: bold;
 }
@@ -59,10 +61,10 @@ a-scene {
   display: none;
   position: fixed;
   inset: 0;
+  z-index: 10000;
   width: 100%;
   height: 100%;
   height: 100dvh;
-  z-index: 10000;
   background: #000;
 }
 
@@ -84,9 +86,8 @@ body.video-mode #message {
 <body>
 
 <div id="message">
-  Studio69 AR<br>
-  Point your camera at the target picture.
-  <br>
+  <strong>Studio69 AR</strong>
+  <p>Point your camera at the target picture.</p>
   <button id="startButton" type="button">Start Camera</button>
 </div>
 
@@ -94,16 +95,22 @@ body.video-mode #message {
   <video
     id="fullVideo"
     src="./video.mp4"
+    preload="auto"
     playsinline
     webkit-playsinline
-    controls
-    preload="auto">
+    controls>
   </video>
 </div>
 
 <a-scene
   id="arScene"
-  mindar-image="imageTargetSrc: ./target.mind; autoStart: false; uiLoading: no; uiScanning: yes; uiError: no;"
+  mindar-image="
+    imageTargetSrc: ./target.mind;
+    autoStart: false;
+    uiLoading: no;
+    uiScanning: yes;
+    uiError: no;
+  "
   color-space="sRGB"
   renderer="colorManagement: true"
   vr-mode-ui="enabled: false"
@@ -130,69 +137,77 @@ body.video-mode #message {
   const video = document.getElementById('fullVideo');
   const target = document.getElementById('targetEntity');
 
-  let started = false;
-  let found = false;
+  let cameraStarted = false;
+  let targetDetected = false;
 
   startButton.addEventListener('click', async () => {
-    if (started) return;
+    if (cameraStarted) return;
 
     startButton.disabled = true;
-    startButton.textContent = 'Starting...';
+    startButton.textContent = 'Starting Camera...';
 
     try {
       const arSystem = scene.systems['mindar-image-system'];
 
       if (!arSystem) {
-        throw new Error('MindAR system not ready');
+        throw new Error('MindAR system is not ready');
       }
 
       await arSystem.start();
-      started = true;
+
+      cameraStarted = true;
       startButton.textContent = 'Scanning...';
-      message.lastChild.textContent =
-        ' Keep the target picture in front of the camera. ';
+
+      message.querySelector('p').textContent =
+        'Keep the complete target picture visible in the camera.';
     } catch (error) {
-      console.error(error);
+      console.error('Camera start error:', error);
+
       startButton.disabled = false;
       startButton.textContent = 'Try Again';
-      message.lastChild.textContent =
-        ' Camera failed to start. Check camera permission and reload. ';
+
+      message.querySelector('p').textContent =
+        'Camera failed. Allow camera access and try again.';
     }
   });
 
   target.addEventListener('targetFound', async () => {
-    if (found) return;
-    found = true;
+    if (targetDetected) return;
+    targetDetected = true;
 
-    // Switch to a separate video layer immediately.
-    document.body.classList.add('video-mode');
+    // Show the independent video player after target recognition.
     videoScreen.style.display = 'block';
+    document.body.classList.add('video-mode');
 
-    // Stop AR tracking/camera; the video is a separate HTML element.
+    // Stop image tracking only after the target has been found.
     try {
       const arSystem = scene.systems['mindar-image-system'];
-      if (arSystem) arSystem.stop();
+
+      if (arSystem) {
+        arSystem.stop();
+      }
     } catch (error) {
-      console.warn('AR stop issue:', error);
+      console.warn('Could not stop AR:', error);
     }
 
-    // Do not pause this video when the target is lost.
+    // The video is independent of the scanned image.
     try {
       await video.play();
     } catch (error) {
-      console.warn('Autoplay blocked; use the Play control.', error);
+      console.warn('Playback needs a user tap:', error);
       video.controls = true;
     }
   });
 
-  // Intentionally no targetLost handler that pauses the video.
+  // Do not pause video on targetLost.
+  // Once playback starts, the target may leave the camera view.
+
+  video.addEventListener('ended', () => {
+    videoScreen.style.display = 'block';
+  });
 
   video.addEventListener('error', () => {
-    console.error('Video could not load. Check video.mp4 filename.');
-    if (found) {
-      videoScreen.style.display = 'block';
-      video.controls = true;
-    }
+    console.error('Video failed to load. Check video.mp4.');
   });
 })();
 </script>
