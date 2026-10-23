@@ -1,9 +1,10 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#080808">
 <title>Studio69 AR Player</title>
 
 <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
@@ -20,34 +21,57 @@ html, body {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #000;
+  background: transparent;
   font-family: Arial, sans-serif;
 }
 
+/* Camera feed: keep it visible behind the AR canvas */
+video.mindar-video {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  z-index: 0 !important;
+  background: transparent !important;
+}
+
+/* AR scene and canvas must remain transparent */
 a-scene {
   position: fixed !important;
   inset: 0 !important;
   width: 100% !important;
   height: 100% !important;
-  z-index: 1;
+  background: transparent !important;
+  z-index: 1 !important;
+}
+
+a-scene canvas {
+  background: transparent !important;
 }
 
 #message {
   position: fixed;
-  z-index: 20;
+  z-index: 100;
   top: 12px;
   left: 12px;
   right: 12px;
-  padding: 12px;
-  background: #171717;
-  color: white;
+  padding: 14px;
+  background: rgba(15, 15, 15, 0.88);
+  color: #fff;
   border: 1px solid #ff7900;
   border-radius: 10px;
   text-align: center;
 }
 
+#message p {
+  margin: 9px 0;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
 #startButton {
-  margin-top: 10px;
+  margin-top: 5px;
   padding: 12px 22px;
   border: none;
   border-radius: 7px;
@@ -57,15 +81,19 @@ a-scene {
   font-weight: bold;
 }
 
+#startButton:disabled {
+  opacity: 0.7;
+}
+
 #videoScreen {
   display: none;
   position: fixed;
   inset: 0;
-  z-index: 10000;
   width: 100%;
   height: 100%;
   height: 100dvh;
   background: #000;
+  z-index: 10000;
 }
 
 #fullVideo {
@@ -76,8 +104,9 @@ a-scene {
   background: #000;
 }
 
+body.video-mode #message,
 body.video-mode a-scene,
-body.video-mode #message {
+body.video-mode video.mindar-video {
   display: none !important;
 }
 </style>
@@ -87,7 +116,9 @@ body.video-mode #message {
 
 <div id="message">
   <strong>Studio69 AR</strong>
-  <p>Point your camera at the target picture.</p>
+  <p id="status">
+    Tap Start Camera, then point your camera at the target picture.
+  </p>
   <button id="startButton" type="button">Start Camera</button>
 </div>
 
@@ -104,15 +135,15 @@ body.video-mode #message {
 
 <a-scene
   id="arScene"
+  embedded
   mindar-image="
     imageTargetSrc: ./target.mind;
     autoStart: false;
     uiLoading: no;
-    uiScanning: yes;
+    uiScanning: no;
     uiError: no;
   "
-  color-space="sRGB"
-  renderer="colorManagement: true"
+  renderer="alpha: true; colorManagement: true"
   vr-mode-ui="enabled: false"
   device-orientation-permission-ui="enabled: false">
 
@@ -132,6 +163,7 @@ body.video-mode #message {
 (() => {
   const scene = document.getElementById('arScene');
   const message = document.getElementById('message');
+  const status = document.getElementById('status');
   const startButton = document.getElementById('startButton');
   const videoScreen = document.getElementById('videoScreen');
   const video = document.getElementById('fullVideo');
@@ -145,29 +177,29 @@ body.video-mode #message {
 
     startButton.disabled = true;
     startButton.textContent = 'Starting Camera...';
+    status.textContent = 'Please allow camera access.';
 
     try {
       const arSystem = scene.systems['mindar-image-system'];
 
       if (!arSystem) {
-        throw new Error('MindAR system is not ready');
+        throw new Error('MindAR system is not ready.');
       }
 
       await arSystem.start();
 
       cameraStarted = true;
       startButton.textContent = 'Scanning...';
+      status.textContent =
+        'Keep the complete target picture in view. The camera image should remain visible.';
 
-      message.querySelector('p').textContent =
-        'Keep the complete target picture visible in the camera.';
     } catch (error) {
       console.error('Camera start error:', error);
 
       startButton.disabled = false;
       startButton.textContent = 'Try Again';
-
-      message.querySelector('p').textContent =
-        'Camera failed. Allow camera access and try again.';
+      status.textContent =
+        'Camera could not start. Check camera permission and internet connection.';
     }
   });
 
@@ -175,42 +207,41 @@ body.video-mode #message {
     if (targetDetected) return;
     targetDetected = true;
 
-    // Show the independent video player after target recognition.
-    videoScreen.style.display = 'block';
-    document.body.classList.add('video-mode');
+    status.textContent = 'Target found. Starting video...';
 
-    // Stop image tracking only after the target has been found.
+    // Display the independent video player.
+    document.body.classList.add('video-mode');
+    videoScreen.style.display = 'block';
+
+    // Stop image tracking; video playback is now independent.
     try {
       const arSystem = scene.systems['mindar-image-system'];
-
       if (arSystem) {
         arSystem.stop();
       }
     } catch (error) {
-      console.warn('Could not stop AR:', error);
+      console.warn('AR stop warning:', error);
     }
 
-    // The video is independent of the scanned image.
     try {
+      video.currentTime = 0;
       await video.play();
     } catch (error) {
-      console.warn('Playback needs a user tap:', error);
+      console.warn('Video playback needs a tap:', error);
+
+      // Keep video controls available if autoplay is blocked.
       video.controls = true;
+      videoScreen.style.display = 'block';
     }
-  });
-
-  // Do not pause video on targetLost.
-  // Once playback starts, the target may leave the camera view.
-
-  video.addEventListener('ended', () => {
-    videoScreen.style.display = 'block';
   });
 
   video.addEventListener('error', () => {
-    console.error('Video failed to load. Check video.mp4.');
+    console.error('Video loading error:', video.error);
+    videoScreen.style.display = 'block';
   });
 })();
 </script>
 
 </body>
 </html>
+```
