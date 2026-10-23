@@ -3,18 +3,19 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#080808">
-  <title>Digital Memories</title>
-  <meta name="description" content="Studio69 creates digital memories for your special moments.">
+
+  <title>Studio69 | Make Your Memories Special</title>
 
   <style>
     :root {
-      --black: #080808;
-      --panel: #141414;
+      --bg: #080808;
+      --card: #151515;
       --orange: #ff7900;
-      --white: #ffffff;
+      --text: #ffffff;
       --muted: #b8b8b8;
+      --border: #383838;
     }
 
     * {
@@ -23,273 +24,374 @@
 
     body {
       margin: 0;
-      background: var(--black);
-      color: var(--white);
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.6;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      margin: auto;
+      padding: 16px;
     }
 
     header {
       text-align: center;
-      padding: 35px 18px 20px;
+      padding: 12px 10px 20px;
+      border-bottom: 1px solid #ff790044;
     }
 
     .logo {
-  display: block;
-  width: 175px;
-  height: 175px;
-  object-fit: contain;
-  margin: 0 auto 4px;
-}
+      display: block;
+      width: 88px;
+      height: 88px;
+      object-fit: contain;
+      margin: 0 auto 2px;
+    }
 
-h1 {
-  margin: 0 0 4px;
-  padding: 0;
-  line-height: 1.1;
-}
+    header h1 {
+      color: var(--orange);
+      font-size: 32px;
+      line-height: 1.1;
+      margin: 0 0 4px;
+      letter-spacing: 1px;
+    }
 
-.tagline {
-  margin: 0;
-  padding: 0;
-  line-height: 1.2;
-}
+    .tagline {
+      margin: 0;
+      font-size: 15px;
+      color: #eeeeee;
+    }
 
-    main {
-      width: min(100% - 30px, 620px);
-      margin: 20px auto 45px;
+    .hero {
+      text-align: center;
+      padding: 24px 8px 20px;
+    }
+
+    .hero h2 {
+      font-size: 25px;
+      line-height: 1.25;
+      margin: 0 0 8px;
+    }
+
+    .hero h2 span {
+      color: var(--orange);
+    }
+
+    .hero p {
+      color: var(--muted);
+      margin: 0;
+      font-size: 14px;
     }
 
     .card {
-      background: var(--panel);
-      border: 1px solid #292929;
-      border-radius: 18px;
-      padding: 25px;
-      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 8px 25px #0005;
     }
 
-    h2 {
+    .card h3 {
       color: var(--orange);
-      text-align: center;
-      margin: 0 0 8px;
-      font-size: 25px;
+      font-size: 21px;
+      margin: 0 0 5px;
     }
 
     .intro {
+      margin: 0 0 20px;
       color: var(--muted);
-      text-align: center;
-      margin: 0 0 25px;
+      font-size: 13px;
+    }
+
+    .field {
+      margin-bottom: 16px;
     }
 
     label {
       display: block;
-      margin: 17px 0 7px;
+      margin-bottom: 7px;
+      font-size: 14px;
       font-weight: bold;
     }
 
     input, select, textarea {
       width: 100%;
-      padding: 13px 14px;
-      border: 1px solid #414141;
-      border-radius: 9px;
+      padding: 12px;
       background: #090909;
-      color: var(--white);
-      font-size: 16px;
-      outline: none;
+      color: white;
+      border: 1px solid #444;
+      border-radius: 7px;
+      font: inherit;
+      font-size: 14px;
     }
 
     input:focus, select:focus, textarea:focus {
+      outline: 1px solid var(--orange);
       border-color: var(--orange);
     }
 
     textarea {
-      min-height: 100px;
+      min-height: 85px;
       resize: vertical;
     }
 
-    .button {
+    .btn {
       display: block;
       width: 100%;
-      padding: 14px 18px;
-      margin-top: 22px;
+      padding: 13px 16px;
+      margin-top: 12px;
       border: none;
-      border-radius: 9px;
-      background: var(--orange);
-      color: #080808;
+      border-radius: 8px;
       text-align: center;
       text-decoration: none;
-      font-size: 17px;
-      font-weight: 800;
+      font-size: 15px;
+      font-weight: bold;
       cursor: pointer;
     }
 
-    .button:hover {
-      background: #ff9638;
+    .btn-orange {
+      background: var(--orange);
+      color: #111;
     }
 
-    .note {
+    .btn-outline {
+      background: transparent;
+      color: var(--orange);
+      border: 1px solid var(--orange);
+    }
+
+    .btn:active {
+      transform: scale(0.99);
+    }
+
+    .scan-section {
+      text-align: center;
+      margin-top: 20px;
+      padding: 18px;
+      background: #111;
+      border: 1px solid #333;
+      border-radius: 12px;
+    }
+
+    .scan-section h3 {
+      margin: 0 0 5px;
+      font-size: 18px;
+    }
+
+    .scan-section p {
       color: var(--muted);
       font-size: 13px;
-      text-align: center;
-      margin: 14px 0 0;
+      margin: 0 0 12px;
     }
 
     footer {
       text-align: center;
-      padding: 25px 15px 30px;
-      border-top: 1px solid #292929;
+      margin-top: 24px;
+      padding: 18px 8px 12px;
+      border-top: 1px solid #333;
       color: var(--muted);
-      font-size: 14px;
+      font-size: 12px;
     }
 
-    .creator {
+    .footer-title {
       color: var(--orange);
       font-weight: bold;
-      font-size: 16px;
+      font-size: 15px;
+      margin: 0 0 3px;
+    }
+
+    .footer-owner {
+      color: white;
+      margin: 0 0 8px;
     }
 
     footer p {
-      margin: 5px 0;
+      margin: 0;
     }
 
-    @media (max-width: 480px) {
-      .card {
-        padding: 20px 16px;
+    @media (max-width: 400px) {
+      .logo {
+        width: 76px;
+        height: 76px;
       }
 
-      .logo {
-        width: 100px;
-        height: 100px;
+      header h1 {
+        font-size: 28px;
+      }
+
+      .hero h2 {
+        font-size: 22px;
+      }
+
+      .card {
+        padding: 16px;
       }
     }
   </style>
 </head>
 
 <body>
-  <header>
-    <img
-      class="logo"
-      src="./launchericon-512x512.png"
-      alt="Studio69 Logo"
-      onerror="this.style.display='none'"
-    >
 
-    <h1 class="brand">Studio69</h1>
-    <p class="tagline">Make Your Memories Special</p>
-  </header>
+  <div class="container">
 
-  <main>
-    <section class="card">
-      <h2>Place Your Order</h2>
+    <header>
+      <img
+        class="logo"
+        src="./launchericon-512x512.png"
+        alt="Studio69 Logo"
+      >
+
+      <h1>Studio69</h1>
+      <p class="tagline">Make Your Memories Special</p>
+    </header>
+
+    <section class="hero">
+      <h2>Your Memories, <span>Reimagined</span></h2>
+      <p>Turn your special moments into extraordinary memories.</p>
+    </section>
+
+    <main class="card">
+      <h3>Place Your Order</h3>
+
       <p class="intro">
-        Share your details with us to get started.
+        Share your details below. We will contact you through WhatsApp
+        to discuss your Studio69 AR project.
       </p>
 
       <form id="orderForm">
-        <label for="customerName">Your Name *</label>
-        <input
-          id="customerName"
-          name="customerName"
-          type="text"
-          placeholder="Enter your full name"
-          required
-        >
 
-        <label for="whatsapp">WhatsApp Number *</label>
-        <input
-          id="whatsapp"
-          name="whatsapp"
-          type="tel"
-          placeholder="Enter your WhatsApp number"
-          required
-        >
+        <div class="field">
+          <label for="customerName">Your Name *</label>
+          <input
+            id="customerName"
+            name="customerName"
+            type="text"
+            placeholder="Enter your full name"
+            required
+          >
+        </div>
 
-        <label for="program">Select Your Program</label>
-        <select id="program" name="program">
-          <option value="">Choose a program (optional)</option>
-          <option>Wedding</option>
-          <option>Engagement</option>
-          <option>Birthday</option>
-          <option>Wedding Anniversary</option>
-          <option>Baby Birth</option>
-          <option>Family Memories</option>
-          <option>Memorial / Loved One</option>
-          <option>Graduation</option>
-          <option>Eid / Festival</option>
-          <option>Religious Occasion</option>
-          <option>School / College Event</option>
-          <option>Business / Product</option>
-          <option>Gadgets</option>
-          <option>Poster / Invitation</option>
-          <option>Party / Special Event</option>
-          <option>Meeting / Conference</option>
-          <option>Travel / Holiday</option>
-          <option>Other</option>
-        </select>
+        <div class="field">
+          <label for="phone">WhatsApp Number *</label>
+          <input
+            id="phone"
+            name="phone"
+            type="tel"
+            placeholder="03XX XXXXXXX"
+            required
+          >
+        </div>
 
-        <label for="address">Delivery Address</label>
-        <textarea
-          id="address"
-          name="address"
-          placeholder="Enter your delivery address (if required)"
-        ></textarea>
+        <div class="field">
+          <label for="program">Program / Occasion *</label>
+          <select id="program" name="program" required>
+            <option value="">Select your occasion</option>
+            <option>Wedding</option>
+            <option>Engagement</option>
+            <option>Birthday</option>
+            <option>Wedding Anniversary</option>
+            <option>Baby Birth</option>
+            <option>Family Memories</option>
+            <option>Memorial / Loved One</option>
+            <option>Eid / Festival</option>
+            <option>Graduation</option>
+            <option>School / College Event</option>
+            <option>Business / Product</option>
+            <option>Gadgets</option>
+            <option>Poster / Invitation</option>
+            <option>Party / Special Event</option>
+            <option>Meeting / Conference</option>
+            <option>Travel / Holiday</option>
+            <option>Other</option>
+          </select>
+        </div>
 
-        <label for="message">Additional Details</label>
-        <textarea
-          id="message"
-          name="message"
-          placeholder="Tell us about your order (optional)"
-        ></textarea>
+        <div class="field">
+          <label for="address">Delivery Address</label>
+          <textarea
+            id="address"
+            name="address"
+            placeholder="Enter your delivery address if required"
+          ></textarea>
+        </div>
 
-        <button class="button" type="submit">
-          Send Order on WhatsApp
+        <div class="field">
+          <label for="message">Additional Details</label>
+          <textarea
+            id="message"
+            name="message"
+            placeholder="Tell us about your idea or requirements"
+          ></textarea>
+        </div>
+
+        <button class="btn btn-orange" type="submit">
+          Send Order via WhatsApp
         </button>
 
-        <p class="note">
-          Your order details will open in WhatsApp for you to review and send.
-          Send your photo or video in the same WhatsApp chat.
-        </p>
       </form>
+    </main>
+
+    <section class="scan-section">
+      <h3>Experience Studio69 AR</h3>
+      <p>
+        Open the scanner, allow camera access, and point your camera
+        at a supported Studio69 target picture.
+      </p>
 
       <a
-        class="button"
-        href="https://wa.me/923212100966"
-        target="_blank"
-        rel="noopener noreferrer"
+        class="btn btn-outline"
+        href="./ar-view.html"
       >
-        Contact Studio69 on WhatsApp
+        Start Scanning
       </a>
     </section>
-  </main>
 
-  <footer>
-    <p class="creator">Digital Memories Creator</p>
-    <p>By Mushtaque Ahmed Rajput</p>
-    <p>© 2026 Studio69. All Rights Reserved.</p>
-  </footer>
+    <footer>
+      <p class="footer-title">Digital Memories Creator</p>
+      <p class="footer-owner">By Mushtaque Ahmed Rajput</p>
+      <p>Contact: 0321-2100966</p>
+      <p>© 2026 Studio69. All Rights Reserved.</p>
+    </footer>
+
+  </div>
 
   <script>
-    document.getElementById("orderForm").addEventListener("submit", function (event) {
+    const orderForm = document.getElementById('orderForm');
+
+    orderForm.addEventListener('submit', function(event) {
       event.preventDefault();
 
-      const name = document.getElementById("customerName").value.trim();
-      const customerWhatsApp = document.getElementById("whatsapp").value.trim();
-      const program = document.getElementById("program").value || "Not specified";
-      const address = document.getElementById("address").value.trim() || "Not provided";
-      const message = document.getElementById("message").value.trim() || "None";
+      const name = document.getElementById('customerName').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const program = document.getElementById('program').value;
+      const address = document.getElementById('address').value.trim();
+      const message = document.getElementById('message').value.trim();
+
+      if (!name || !phone || !program) {
+        alert('Please complete all required fields.');
+        return;
+      }
 
       const orderText =
-        "STUDIO69 - NEW ORDER\n\n" +
-        "Customer Name: " + name + "\n" +
-        "Customer WhatsApp: " + customerWhatsApp + "\n" +
-        "Program: " + program + "\n" +
-        "Delivery Address: " + address + "\n" +
-        "Additional Details: " + message;
+        'STUDIO69 AR - CUSTOMER ORDER\n\n' +
+        'Name: ' + name + '\n' +
+        'Customer WhatsApp: ' + phone + '\n' +
+        'Program / Occasion: ' + program + '\n' +
+        'Delivery Address: ' + (address || 'Not provided') + '\n' +
+        'Additional Details: ' + (message || 'None') + '\n\n' +
+        'Please contact me about my Studio69 AR order.';
 
       const whatsappURL =
-        "https://wa.me/923212100966?text=" + encodeURIComponent(orderText);
+        'https://wa.me/923212100966?text=' +
+        encodeURIComponent(orderText);
 
-      window.open(whatsappURL, "_blank");
+      window.open(whatsappURL, '_blank');
     });
   </script>
+
 </body>
 </html>
