@@ -4,15 +4,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#101827">
 
-  <title>Studio69 AR</title>
-
-  <meta
-    name="description"
-    content="Scan a picture with Studio69 AR and watch its video."
-  >
-
-  <meta name="theme-color" content="#0284c7">
+  <title>Studio69 AR | Digital Memories Creator</title>
+  <meta name="description" content="Studio69 AR creates digital memories with augmented reality. Place your order for weddings, birthdays, celebrations and more.">
 
   <link rel="manifest" href="./manifest.json">
 
@@ -23,97 +18,361 @@
 
     body {
       margin: 0;
+      padding: 22px 14px;
       min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
       font-family: Arial, sans-serif;
-      color: white;
-      background: linear-gradient(135deg, #101827, #075985);
+      color: #f8fafc;
+      background: linear-gradient(145deg, #101827, #073b5c, #111827);
     }
 
     .container {
       width: 100%;
-      max-width: 440px;
-      padding: 32px 24px;
-      text-align: center;
-      border: 1px solid rgba(255,255,255,0.18);
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    .card {
+      padding: 26px 20px;
+      border: 1px solid rgba(255,255,255,.15);
       border-radius: 22px;
-      background: rgba(255,255,255,0.08);
-      box-shadow: 0 15px 45px rgba(0,0,0,0.25);
+      background: rgba(255,255,255,.07);
+      box-shadow: 0 15px 45px rgba(0,0,0,.25);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand {
+      text-align: center;
+      padding-bottom: 22px;
     }
 
     .logo {
       width: 76px;
       height: 76px;
-      margin: 0 auto 18px;
+      margin: 0 auto 14px;
       display: flex;
       align-items: center;
       justify-content: center;
+      border: 2px solid #fb923c;
       border-radius: 20px;
-      background: #0284c7;
-      font-size: 25px;
-      font-weight: bold;
+      background: #030712;
+      color: #fb923c;
+      font-size: 29px;
+      font-weight: 900;
     }
 
     h1 {
-      margin: 0 0 12px;
-      font-size: 32px;
+      margin: 0;
+      font-size: 31px;
+      letter-spacing: 1px;
     }
 
-    p {
-      line-height: 1.7;
-      color: #e0f2fe;
-    }
-
-    .start-button {
-      display: block;
-      margin-top: 26px;
-      padding: 16px 20px;
-      border-radius: 12px;
-      background: #0284c7;
-      color: white;
-      text-decoration: none;
-      font-size: 18px;
+    .tagline {
+      margin: 8px 0;
+      color: #fdba74;
       font-weight: bold;
     }
 
-    .start-button:hover {
-      background: #0369a1;
+    .intro {
+      color: #dbeafe;
+      line-height: 1.7;
+      font-size: 14px;
     }
 
-    .note {
-      margin-top: 22px;
-      font-size: 13px;
+    h2 {
+      margin: 12px 0 16px;
+      font-size: 21px;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 7px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    input, select, textarea {
+      display: block;
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #475569;
+      border-radius: 10px;
+      background: #f8fafc;
+      color: #111827;
+      font: inherit;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 85px;
+      resize: vertical;
+    }
+
+    .hint {
+      margin: 7px 0;
       color: #cbd5e1;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .button {
+      display: block;
+      width: 100%;
+      margin-top: 13px;
+      padding: 15px 12px;
+      border: none;
+      border-radius: 11px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .order-button {
+      background: #16a34a;
+      color: white;
+    }
+
+    .scan-button {
+      background: #0284c7;
+      color: white;
+    }
+
+    .contact-button {
+      background: #f97316;
+      color: #111827;
+    }
+
+    .button:hover {
+      filter: brightness(1.08);
+    }
+
+    .contact-card {
+      margin-top: 18px;
+      padding: 17px;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      background: rgba(0,0,0,.18);
+    }
+
+    .contact-card p {
+      margin: 9px 0;
+      line-height: 1.6;
+    }
+
+    .footer {
+      margin: 22px 0 8px;
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 12px;
+      line-height: 1.8;
+    }
+
+    .footer a {
+      color: #fdba74;
     }
   </style>
 </head>
 
 <body>
   <main class="container">
-    <div class="logo">69</div>
+    <section class="card">
 
-    <h1>Studio69 AR</h1>
+      <header class="brand">
+        <div class="logo">69</div>
+        <h1>STUDIO69 AR</h1>
+        <p class="tagline">Digital Memories Creator</p>
+        <p class="intro">
+          By Mushtaque Ahmed Rajput<br>
+          Scan the picture. Watch the memory come alive.
+        </p>
+      </header>
 
-    <p>
-      Scan the picture.<br>
-      Watch the video.
-    </p>
+      <h2>Place Your Order</h2>
 
-    <p>
-      Point your mobile camera at a supported Studio69 target picture
-      and watch its video play automatically.
-    </p>
+      <form id="orderForm">
 
-    <a class="start-button" href="./ar-view.html">
-      Start Scanning
-    </a>
+        <label for="customerName">Your Full Name *</label>
+        <input
+          id="customerName"
+          name="customerName"
+          type="text"
+          autocomplete="name"
+          placeholder="Enter your name"
+          required
+        >
 
-    <p class="note">
-      Camera permission is required to scan pictures.
-    </p>
+        <label for="customerPhone">Your Contact Number *</label>
+        <input
+          id="customerPhone"
+          name="customerPhone"
+          type="tel"
+          autocomplete="tel"
+          placeholder="03XXXXXXXXX"
+          required
+        >
+
+        <label for="program">Select Your Program *</label>
+        <select id="program" name="program" required>
+          <option value="">-- Select a program --</option>
+          <option>Wedding / Shadi</option>
+          <option>Engagement / Mangni</option>
+          <option>Birthday</option>
+          <option>Wedding Anniversary</option>
+          <option>Eid and Festivals</option>
+          <option>Family Memories</option>
+          <option>Memorial / Late Loved One</option>
+          <option>Baby Birth</option>
+          <option>Graduation / Achievement</option>
+          <option>School and College Events</option>
+          <option>Business Promotion</option>
+          <option>Product Advertisement</option>
+          <option>Gadgets and Electronics</option>
+          <option>Posters and Invitations</option>
+          <option>Events and Parties</option>
+          <option>Meetings and Conferences</option>
+          <option>Travel and Holidays</option>
+          <option>Religious and Special Occasions</option>
+          <option>Custom Program</option>
+        </select>
+
+        <label for="photoType">What do you need? *</label>
+        <select id="photoType" name="photoType" required>
+          <option value="">-- Select a service --</option>
+          <option>AR Photo Frame</option>
+          <option>Photo with Video</option>
+          <option>AI Photo Design</option>
+          <option>Digital Memory Gift</option>
+          <option>Business / Product AR</option>
+          <option>Need advice from Studio69</option>
+        </select>
+
+        <label for="deliveryAddress">Delivery Address</label>
+        <textarea
+          id="deliveryAddress"
+          name="deliveryAddress"
+          autocomplete="street-address"
+          placeholder="Enter your complete address if a physical frame is required"
+        ></textarea>
+
+        <label for="message">Your Message / Special Instructions</label>
+        <textarea
+          id="message"
+          name="message"
+          placeholder="Write your idea, dedication or special request"
+        ></textarea>
+
+        <p class="hint">
+          After opening WhatsApp, send your order message.
+          Then attach your photo and video in the same chat.
+          Please do not send private photos without confirming
+          the recipient.
+        </p>
+
+        <button class="button order-button" type="submit">
+          Place Your Order on WhatsApp
+        </button>
+
+      </form>
+
+      <a
+        class="button scan-button"
+        href="./ar-view.html"
+      >
+        Start Scanning
+      </a>
+
+      <section class="contact-card">
+        <h2>Contact Studio69</h2>
+
+        <p>
+          <strong>Creator:</strong><br>
+          Mushtaque Ahmed Rajput
+        </p>
+
+        <p>
+          <strong>Contact Number:</strong><br>
+          <a href="tel:+923212100966" style="color:#fff">
+            0321 2100966
+          </a>
+        </p>
+
+        <p>
+          <strong>WhatsApp Number:</strong><br>
+          <a
+            href="https://wa.me/923212100966"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="color:#86efac"
+          >
+            0321 2100966 — Chat on WhatsApp
+          </a>
+        </p>
+
+        <a
+          class="button contact-button"
+          href="https://wa.me/923212100966"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Contact Us on WhatsApp
+        </a>
+      </section>
+
+      <footer class="footer">
+        Studio69 AR — Digital Memories Creator<br>
+        Scan the picture. Watch the video.<br>
+        &copy; 2026 Studio69. All rights reserved.
+      </footer>
+
+    </section>
   </main>
+
+  <script>
+    const orderForm = document.getElementById("orderForm");
+
+    orderForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      const customerName =
+        document.getElementById("customerName").value.trim();
+
+      const customerPhone =
+        document.getElementById("customerPhone").value.trim();
+
+      const program =
+        document.getElementById("program").value;
+
+      const photoType =
+        document.getElementById("photoType").value;
+
+      const deliveryAddress =
+        document.getElementById("deliveryAddress").value.trim();
+
+      const message =
+        document.getElementById("message").value.trim();
+
+      const orderMessage = [
+        "STUDIO69 AR - NEW CUSTOMER ORDER",
+        "",
+        "Creator: Mushtaque Ahmed Rajput",
+        "Customer Name: " + customerName,
+        "Customer Contact: " + customerPhone,
+        "Program: " + program,
+        "Requested Service: " + photoType,
+        "Delivery Address: " + (deliveryAddress || "Not provided"),
+        "Special Instructions: " + (message || "None"),
+        "",
+        "I will send my photo and video in this WhatsApp chat.",
+        "Please confirm the order details and price."
+      ].join("\n");
+
+      const whatsappURL =
+        "https://wa.me/923212100966?text=" +
+        encodeURIComponent(orderMessage);
+
+      window.open(whatsappURL, "_blank");
+    });
+  </script>
 </body>
 </html>
