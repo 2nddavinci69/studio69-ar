@@ -31,12 +31,15 @@
       z-index: 1;
     }
 
-    #arScene canvas {
-      position: fixed !important;
-      inset: 0 !important;
-      width: 100% !important;
-      height: 100% !important;
-    }
+    
+#arScene canvas {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+}
 
     /* Keep the live camera preview full-screen */
   video.mindar-video {
